@@ -1,4 +1,4 @@
-#include "config.h"
+#include "config.hpp"
 #include "paper_datetime.hpp"
 #include "paper_wifi.hpp"
 #include "calendar.hpp"
@@ -61,7 +61,7 @@ void current_date_to_display() {
 }
 
 void events_to_display() {
-  Calendar cal;
+  Calendar cal(SYNOLOGY_WEBAPI);
   if (cal.error()) {
     Serial.println(cal.last_error_message);
     return;

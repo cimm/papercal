@@ -48,16 +48,17 @@ public:
 };
 
 class Calendar {
-  const char* _base_url = "http://keszthely.home:5000/webapi";
-  int _auth_max_api_version;
-  int _event_max_api_version;
+  String _webapi_url;
   String _sid;
   String _synotoken;
+  int _auth_max_api_version;
+  int _event_max_api_version;
 
 public:
   String last_error_message = "";
 
-  Calendar() {
+  Calendar(const char* webapi_url) {
+    _webapi_url = webapi_url;
     fetch_api_versions();
   }
 
@@ -65,10 +66,10 @@ public:
     return last_error_message != "";
   }
 
-  void authenticate(char* account, char* passwd) {
+  void authenticate(const char* account, const char* passwd) {
     last_error_message = "";
-    String url_buf = "{base}/auth.cgi?api=SYNO.API.Auth&method=login&version={ver}&account={acc}&passwd={pwd}&format=sid&enable_syno_token=yes";
-    url_buf.replace("{base}", _base_url);
+    String url_buf = "{api}/auth.cgi?api=SYNO.API.Auth&method=login&version={ver}&account={acc}&passwd={pwd}&format=sid&enable_syno_token=yes";
+    url_buf.replace("{api}", _webapi_url);
     url_buf.replace("{ver}", String(_auth_max_api_version));
     url_buf.replace("{acc}", account);
     url_buf.replace("{pwd}", passwd);
@@ -89,8 +90,8 @@ public:
 
   JsonArrayConst events(char* cal_id, tm start, tm end, size_t capacity, bool repeat = true) {  // capacity is the JSON doc memory to reserve
     last_error_message = "";
-    String url_buf = "{base}/entry.cgi?version={ver}&cal_id_list=['{cal_id}']&start={start}&end={end}&list_repeat={repeat}&api=SYNO.Cal.Event&method=list&_sid={sid}";  // start & and are unix timestamps
-    url_buf.replace("{base}", _base_url);
+    String url_buf = "{api}/entry.cgi?version={ver}&cal_id_list=['{cal_id}']&start={start}&end={end}&list_repeat={repeat}&api=SYNO.Cal.Event&method=list&_sid={sid}";  // start & and are unix timestamps
+    url_buf.replace("{api}", _webapi_url);
     url_buf.replace("{ver}", String(_event_max_api_version));
     url_buf.replace("{cal_id}", cal_id);
     time_t start_timestamp = mktime(&start);
@@ -116,8 +117,8 @@ public:
 
   void logout() {
     last_error_message = "";
-    String url_buf = "{base}/auth.cgi?api=SYNO.API.Auth&version={ver}&method=logout";
-    url_buf.replace("{base}", _base_url);
+    String url_buf = "{api}/auth.cgi?api=SYNO.API.Auth&version={ver}&method=logout";
+    url_buf.replace("{api}", _webapi_url);
     url_buf.replace("{ver}", String(_auth_max_api_version));
     char* url = new char[url_buf.length() + 1];
     strcpy(url, url_buf.c_str());
@@ -132,8 +133,8 @@ public:
 private:
   void fetch_api_versions() {
     last_error_message = "";
-    String url_buf = "{base}/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth,SYNO.Cal.Event";
-    url_buf.replace("{base}", _base_url);
+    String url_buf = "{api}/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth,SYNO.Cal.Event";
+    url_buf.replace("{api}", _webapi_url);
     char* url = new char[url_buf.length() + 1];
     strcpy(url, url_buf.c_str());
     DynamicJsonDocument version_doc = fetch_json(url);
@@ -152,7 +153,7 @@ private:
     http.useHTTP10(true);
     http.begin(client, url);
     if (_synotoken != "") { http.addHeader("X-SYNO-TOKEN", _synotoken); }  // authenticated
-    DynamicJsonDocument doc(capacity); // TODO ArduinoJSON can filter fields to limit memory, usefull for the events JSON
+    DynamicJsonDocument doc(capacity);                                     // TODO ArduinoJSON can filter fields to limit memory, usefull for the events JSON
     int response_code = http.GET();
     if (response_code == HTTP_CODE_OK) {
       DeserializationError json_error = deserializeJson(doc, http.getStream());
