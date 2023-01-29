@@ -70,6 +70,7 @@ void events_to_display() {
   cal.authenticate(SYNOLOGY_ACCOUNT, SYNOLOGY_PASSWORD);
   if (cal.error()) {
     Serial.println(cal.last_error_message);
+    return;
   }
 
   struct tm start = device_datetime.time_info;  // now
@@ -80,22 +81,20 @@ void events_to_display() {
   end.tm_hour = 23;
   end.tm_min = 59;
 
+  Paperdink.epd.setTextColor(GxEPD_BLACK);
+  Paperdink.epd.setTextSize(2);
+  Paperdink.epd.setCursor(0, 10 * padding);
   JsonArrayConst events = cal.events(SYNOLOGY_CALENDAR_ID, start, end, 1024 * 30, false);  // TODO How do we know how much memory is needed?
   if (cal.error()) {
     Serial.println(cal.last_error_message);
+    Paperdink.epd.println("No events for today.");
   } else {
-    Paperdink.epd.setTextColor(GxEPD_BLACK);
-    Paperdink.epd.setTextSize(2);
-    Paperdink.epd.setCursor(0, 10 * padding);
     for (JsonVariantConst event : events) {
       event_to_display(event);
     }
   }
 
   cal.logout();
-  if (cal.error()) {
-    Serial.println(cal.last_error_message);
-  }
 }
 
 void event_to_display(Event event) {
