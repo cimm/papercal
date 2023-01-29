@@ -111,9 +111,9 @@ void event_to_display(Event event) {
 
 void refresh_datetime_to_display() {
   char formatted_refresh_date[30];
-  device_datetime.format("Refresh: %d/%m %H:%M", formatted_refresh_date, sizeof(formatted_refresh_date));
+  device_datetime.format("%d/%m %H:%M", formatted_refresh_date, sizeof(formatted_refresh_date));
   Paperdink.epd.setTextSize(1);
-  Paperdink.epd.setCursor(Paperdink.epd.width() - 120 - padding, Paperdink.epd.height() - 2 * padding);
+  Paperdink.epd.setCursor(Paperdink.epd.width() - 65 - padding, Paperdink.epd.height() - 2 * padding);
   Paperdink.epd.print(formatted_refresh_date);
 }
 
