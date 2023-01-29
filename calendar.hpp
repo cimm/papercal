@@ -16,7 +16,7 @@ public:
   }
 
   tm start() {
-    struct tm time_info;
+    struct tm time_info = { 0 };
     String start = _json_event["dtstart"];
     if (is_all_day() || start == "") { return time_info; }
     String start_without_tz = start;
