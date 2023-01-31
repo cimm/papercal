@@ -63,13 +63,13 @@ void current_date_to_display() {
 void events_to_display() {
   Calendar cal(SYNOLOGY_WEBAPI);
   if (cal.error()) {
-    Serial.println(cal.last_error_message);
+    error_to_display(cal.last_error_message.c_str());
     return;
   }
 
   cal.authenticate(SYNOLOGY_ACCOUNT, SYNOLOGY_PASSWORD);
   if (cal.error()) {
-    Serial.println(cal.last_error_message);
+    error_to_display(cal.last_error_message.c_str());
     return;
   }
 
@@ -86,8 +86,7 @@ void events_to_display() {
   Paperdink.epd.setCursor(0, 10 * padding);
   JsonArrayConst events = cal.events(SYNOLOGY_CALENDAR_ID, start, end, 1024 * 30, false);  // TODO How do we know how much memory is needed?
   if (cal.error()) {
-    Serial.println(cal.last_error_message);
-    Paperdink.epd.println("No events for today.");
+    error_to_display(cal.last_error_message.c_str());
   } else {
     for (JsonVariantConst event : events) {
       event_to_display(event);
@@ -106,6 +105,12 @@ void event_to_display(Event event) {
   String summary = event.summary();
   if (summary.length() > 24) { summary = summary.substring(0, 24) + "-"; }
   Paperdink.epd.println(summary);
+}
+
+void error_to_display(const char* error_message) {
+  Paperdink.epd.setTextSize(1);
+  Paperdink.epd.setCursor(padding, Paperdink.epd.height() - 2 * padding);
+  Paperdink.epd.print(error_message);
 }
 
 void refresh_datetime_to_display() {

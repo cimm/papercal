@@ -80,7 +80,7 @@ public:
 
     bool success = auth_doc["success"].as<bool>();
     if (!success) {
-      last_error_message = "Synology API error: could not authenticate";
+      last_error_message = "Synology API could not authenticate";
       return;
     }
 
@@ -110,7 +110,7 @@ public:
 
     JsonArrayConst events = events_doc["data"][cal_id];
     if (events.size() == 0) {
-      last_error_message = "Synology API error: no events found";
+      last_error_message = "Synology API found no events";
     }
     return events;
   }
@@ -126,7 +126,7 @@ public:
 
     bool success = logout_doc["success"].as<bool>();
     if (!success) {
-      last_error_message = "Synology API error: could not logout";
+      last_error_message = "Synology API could not logout";
     }
   }
 
@@ -158,7 +158,7 @@ private:
     if (response_code == HTTP_CODE_OK) {
       DeserializationError json_error = deserializeJson(doc, http.getStream());
       if (json_error) {
-        last_error_message = "JSON deserialization error: ";
+        last_error_message = "Deserialization error: ";
         last_error_message += json_error.c_str();
       }
     } else {
