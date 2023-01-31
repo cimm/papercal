@@ -17,7 +17,6 @@ void setup() {
   init_display();
   connect_wifi();
   fetch_datetime();
-  current_date_to_display();
   events_to_display();
   refresh_datetime_to_display();
   disconnect_wifi();
@@ -50,15 +49,6 @@ void refresh_display() {
   Paperdink.epd.display();
 }
 
-void current_date_to_display() {
-  char formatted_current_date[30];
-  device_datetime.format("%a %d %b", formatted_current_date, sizeof(formatted_current_date));
-  Paperdink.epd.fillRect(0, 0, Paperdink.epd.width(), 8 * padding, GxEPD_BLACK);
-  Paperdink.epd.setTextColor(GxEPD_WHITE);
-  Paperdink.epd.setTextSize(4);
-  Paperdink.epd.setCursor(padding, padding);
-  Paperdink.epd.println(formatted_current_date);
-}
 
 void events_to_display() {
   Calendar cal(SYNOLOGY_WEBAPI);
@@ -73,8 +63,16 @@ void events_to_display() {
     return;
   }
 
-  struct tm start = device_datetime.time_info;  // now
-  struct tm end = { 0 };                        // end of today
+  struct tm now = device_datetime.time_info;
+  struct tm start = now;
+  if (now.tm_hour >= SHOW_NEXT_DAY_FROM_HOUR) {
+    time_t next_day_timestamp = mktime(&now) + (24 * 60 * 60);  // add 1 day in seconds
+    start = *localtime(&next_day_timestamp);
+  }
+
+  title_to_display(start);
+
+  struct tm end = { 0 };
   end.tm_year = start.tm_year;
   end.tm_mon = start.tm_mon;
   end.tm_mday = start.tm_mday;
@@ -105,6 +103,16 @@ void event_to_display(Event event) {
   String summary = event.summary();
   if (summary.length() > 24) { summary = summary.substring(0, 24) + "-"; }
   Paperdink.epd.println(summary);
+}
+
+void title_to_display(struct tm time_info) {
+  char formatted_date[11];
+  strftime(formatted_date, 11, "%a %e %b", &time_info);
+  Paperdink.epd.fillRect(0, 0, Paperdink.epd.width(), 8 * padding, GxEPD_BLACK);
+  Paperdink.epd.setTextColor(GxEPD_WHITE);
+  Paperdink.epd.setTextSize(4);
+  Paperdink.epd.setCursor(padding, padding);
+  Paperdink.epd.println(formatted_date);
 }
 
 void error_to_display(const char* error_message) {
