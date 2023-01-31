@@ -1,27 +1,26 @@
 #include "config.hpp"
-#include "paper_datetime.hpp"
+#include "paper_display.hpp"
 #include "paper_wifi.hpp"
+#include "paper_datetime.hpp"
 #include "calendar.hpp"
-#include "Paperdink.h"
 
 #include <time.h>
 #include <ArduinoJson.h>
 
-PAPERDINK_DEVICE Paperdink;
 const int padding = 5;
+PaperDisplay device_display;
 PaperWifi device_wifi;
 PaperDatetime device_datetime;
 
 void setup() {
   Serial.begin(115200);
-  init_display();
+  enable_display();
   connect_wifi();
   fetch_datetime();
   events_to_display();
   refresh_datetime_to_display();
   disconnect_wifi();
   refresh_display();
-  deep_sleep();
 }
 
 void loop() {}
@@ -38,17 +37,15 @@ void fetch_datetime() {
   device_datetime.fetch();
 }
 
-void init_display() {
-  Paperdink.begin();
-  Paperdink.enable_display();
-  Paperdink.epd.fillScreen(GxEPD_WHITE);
-  Paperdink.epd.setTextColor(GxEPD_BLACK);
+void enable_display() {
+  device_display.enable_display();
+  device_display.panel.fillScreen(GxEPD_WHITE);
+  device_display.panel.setTextColor(GxEPD_BLACK);
 }
 
 void refresh_display() {
-  Paperdink.epd.display();
+  device_display.panel.display();
 }
-
 
 void events_to_display() {
   Calendar cal(SYNOLOGY_WEBAPI);
@@ -79,9 +76,9 @@ void events_to_display() {
   end.tm_hour = 23;
   end.tm_min = 59;
 
-  Paperdink.epd.setTextColor(GxEPD_BLACK);
-  Paperdink.epd.setTextSize(2);
-  Paperdink.epd.setCursor(0, 10 * padding);
+  device_display.panel.setTextColor(GxEPD_BLACK);
+  device_display.panel.setTextSize(2);
+  device_display.panel.setCursor(0, 10 * padding);
   JsonArrayConst events = cal.events(SYNOLOGY_CALENDAR_ID, start, end, 1024 * 30, false);  // TODO How do we know how much memory is needed?
   if (cal.error()) {
     error_to_display(cal.last_error_message.c_str());
@@ -95,41 +92,36 @@ void events_to_display() {
 }
 
 void event_to_display(Event event) {
-  Paperdink.epd.print(" ");
+  device_display.panel.print(" ");
   char formatted_start[8];
   event.formatted_start("%H:%M", formatted_start, sizeof(formatted_start));
-  Paperdink.epd.print(formatted_start);
-  Paperdink.epd.print(" ");
+  device_display.panel.print(formatted_start);
+  device_display.panel.print(" ");
   String summary = event.summary();
   if (summary.length() > 24) { summary = summary.substring(0, 24) + "-"; }
-  Paperdink.epd.println(summary);
+  device_display.panel.println(summary);
 }
 
 void title_to_display(struct tm time_info) {
   char formatted_date[11];
   strftime(formatted_date, 11, "%a %e %b", &time_info);
-  Paperdink.epd.fillRect(0, 0, Paperdink.epd.width(), 8 * padding, GxEPD_BLACK);
-  Paperdink.epd.setTextColor(GxEPD_WHITE);
-  Paperdink.epd.setTextSize(4);
-  Paperdink.epd.setCursor(padding, padding);
-  Paperdink.epd.println(formatted_date);
+  device_display.panel.fillRect(0, 0, device_display.panel.width(), 8 * padding, GxEPD_BLACK);
+  device_display.panel.setTextColor(GxEPD_WHITE);
+  device_display.panel.setTextSize(4);
+  device_display.panel.setCursor(padding, padding);
+  device_display.panel.println(formatted_date);
 }
 
 void error_to_display(const char* error_message) {
-  Paperdink.epd.setTextSize(1);
-  Paperdink.epd.setCursor(padding, Paperdink.epd.height() - 2 * padding);
-  Paperdink.epd.print(error_message);
+  device_display.panel.setTextSize(1);
+  device_display.panel.setCursor(padding, device_display.panel.height() - 2 * padding);
+  device_display.panel.print(error_message);
 }
 
 void refresh_datetime_to_display() {
   char formatted_refresh_date[30];
   device_datetime.format("%d/%m %H:%M", formatted_refresh_date, sizeof(formatted_refresh_date));
-  Paperdink.epd.setTextSize(1);
-  Paperdink.epd.setCursor(Paperdink.epd.width() - 65 - padding, Paperdink.epd.height() - 2 * padding);
-  Paperdink.epd.print(formatted_refresh_date);
-}
-
-void deep_sleep() {
-  uint64_t sleep_in_microseconds = 3600000000 * 6;  // = 6 hours
-  Paperdink.deep_sleep_timer_button_wakeup(sleep_in_microseconds, BUTTON_1_PIN);
+  device_display.panel.setTextSize(1);
+  device_display.panel.setCursor(device_display.panel.width() - 65 - padding, device_display.panel.height() - 2 * padding);
+  device_display.panel.print(formatted_refresh_date);
 }

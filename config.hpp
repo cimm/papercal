@@ -1,6 +1,3 @@
-// Device type: Paperdink_Classir or Paperdink_Merlot
-#define PAPERDINK_DEVICE Paperdink_Classic
-
 // WiFi credentials
 #define WIFI_SSID "ssid"
 #define WIFI_PASSWORD "password"
