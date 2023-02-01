@@ -8,4 +8,5 @@
 #define SYNOLOGY_PASSWORD "password"
 #define SYNOLOGY_CALENDAR_ID "/user/calendar_id/"  // Click chevron next to calendar name in webview → CALDav Account → Thunderbird
 
-#define SHOW_NEXT_DAY_FROM_HOUR 18  // Show next day's events from 18h00 onwards
+#define TIME_ZONE "TZ_Europe_Brussels"  // See https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv
+#define SHOW_NEXT_DAY_FROM_HOUR 18      // Show next day's events from 18h00 onwards

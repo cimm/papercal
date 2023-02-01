@@ -8,14 +8,14 @@
 
 class PaperDatetime {
   const char* ntp_server = "pool.ntp.org";
-  const long gmt_offset_sec = 3600;  // = CET or GMT+1
-  const int daylight_offset_sec = 3600;
 
 public:
   struct tm time_info;
 
-  void fetch() {
-    configTime(gmt_offset_sec, daylight_offset_sec, ntp_server);
+  void fetch(const char* time_zone) {
+    configTime(0, 0, ntp_server);
+    setenv("TZ", time_zone, 1);
+    tzset();
     while (!getLocalTime(&time_info)) {
       delay(500);
     }

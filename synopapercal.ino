@@ -5,8 +5,9 @@
 #include "syno_calendar.hpp"
 #include "syno_event.hpp"
 
-#include <time.h>
 #include <ArduinoJson.h>
+#include <GxEPD2_BW.h>
+#include <time.h>
 
 const int padding = 5;
 PaperDisplay device_display;
@@ -35,7 +36,7 @@ void disconnect_wifi() {
 }
 
 void fetch_datetime() {
-  device_datetime.fetch();
+  device_datetime.fetch(TIME_ZONE);
 }
 
 void enable_display() {
