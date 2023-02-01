@@ -9,6 +9,8 @@
 #include <GxEPD2_BW.h>
 #include <time.h>
 
+#define BUTTON_1_PIN 14
+
 const int padding = 5;
 PaperDisplay device_display;
 PaperWifi device_wifi;
@@ -23,6 +25,7 @@ void setup() {
   refresh_datetime_to_display();
   disconnect_wifi();
   refresh_display();
+  deep_sleep_time_button_wakeup(3600 * 3);
 }
 
 void loop() {}
@@ -126,4 +129,11 @@ void refresh_datetime_to_display() {
   device_display.panel.setTextSize(1);
   device_display.panel.setCursor(device_display.panel.width() - 65 - padding, device_display.panel.height() - 2 * padding);
   device_display.panel.print(formatted_refresh_date);
+}
+
+void deep_sleep_time_button_wakeup(uint64_t sleep_seconds) {  // TODO Extract to PaperDevice class or something
+  esp_sleep_enable_timer_wakeup(sleep_seconds * 1000000);
+  esp_sleep_enable_ext0_wakeup((gpio_num_t)BUTTON_1_PIN, 0);
+  Serial.printf("Wakeup after %lld sec or button on pin %d", sleep_seconds, BUTTON_1_PIN);
+  esp_deep_sleep_start();
 }
