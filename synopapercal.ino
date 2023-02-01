@@ -2,7 +2,8 @@
 #include "paper_display.hpp"
 #include "paper_wifi.hpp"
 #include "paper_datetime.hpp"
-#include "calendar.hpp"
+#include "syno_calendar.hpp"
+#include "syno_event.hpp"
 
 #include <time.h>
 #include <ArduinoJson.h>
@@ -48,7 +49,7 @@ void refresh_display() {
 }
 
 void events_to_display() {
-  Calendar cal(SYNOLOGY_WEBAPI);
+  SynoCalendar cal(SYNOLOGY_WEBAPI);
   if (cal.error()) {
     error_to_display(cal.last_error_message.c_str());
     return;
@@ -91,7 +92,7 @@ void events_to_display() {
   cal.logout();
 }
 
-void event_to_display(Event event) {
+void event_to_display(SynoEvent event) {
   device_display.panel.print(" ");
   char formatted_start[8];
   event.formatted_start("%H:%M", formatted_start, sizeof(formatted_start));
