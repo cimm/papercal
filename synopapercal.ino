@@ -70,6 +70,8 @@ void events_to_display() {
   if (now.tm_hour >= SHOW_NEXT_DAY_FROM_HOUR) {
     time_t next_day_timestamp = mktime(&now) + (24 * 60 * 60);  // add 1 day in seconds
     start = *localtime(&next_day_timestamp);
+    start.tm_hour = 0;  // beginning of day
+    start.tm_min = 1;
   }
 
   title_to_display(start);
