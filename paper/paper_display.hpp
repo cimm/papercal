@@ -5,7 +5,6 @@
 #define EPD_EN   12
 #define EPD_RST  13
 
-#define ENABLE_GxEPD2_GFX 1
 #include <GxEPD2_BW.h>
 
 class PaperDisplay {
