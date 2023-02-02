@@ -7,13 +7,11 @@
 #include <time.h>
 
 class PaperDatetime {
-  const char* ntp_server = "pool.ntp.org";
-
 public:
   struct tm time_info;
 
-  void fetch(const char* time_zone) {
-    configTzTime(time_zone, ntp_server);
+  void fetch(const char* time_zone, const char* ntp_pool = "pool.ntp.org") {
+    configTzTime(time_zone, ntp_pool);
     while (!getLocalTime(&time_info)) {
       delay(500);
     }

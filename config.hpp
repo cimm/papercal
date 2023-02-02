@@ -10,3 +10,4 @@
 
 #define TIME_ZONE "CET-1CEST,M3.5.0,M10.5.0/3"  // See https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv
 #define SHOW_NEXT_DAY_FROM_HOUR 18  // Show next day's events from 18h00 onwards
+#define NTP_POOL "pool.ntp.org"

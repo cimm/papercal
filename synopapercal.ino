@@ -39,7 +39,7 @@ void disconnect_wifi() {
 }
 
 void fetch_datetime() {
-  device_datetime.fetch(TIME_ZONE);
+  device_datetime.fetch(TIME_ZONE, NTP_POOL);
 }
 
 void enable_display() {
