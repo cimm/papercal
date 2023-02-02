@@ -17,7 +17,7 @@ PaperWifi device_wifi;
 PaperDatetime device_datetime;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   enable_display();
   connect_wifi();
   fetch_datetime();

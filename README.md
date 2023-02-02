@@ -1,16 +1,47 @@
 # SynoPaperCal
 
-SynoPaperCal is an application for [Paperd.Ink](https://paperd.ink/) Classic devices. It connects to a [Synology Calendar](https://www.synology.com/en-us/dsm/feature/calendar) and displays today’s events. SynoPaperCal is still being developed, it kind of works for me but is not production ready software yet.
+SynoPaperCal is a calendar application for [Paperd.Ink](https://paperd.ink/) Classic devices. It connects to a [Synology Calendar](https://www.synology.com/en-us/dsm/feature/calendar) and displays the upcoming events.
 
-## Library Dependencies
+SynoPaperCal is under active development, it kind of works for me but is not production ready software. It does not support HTTPS yet, so your Synology username and password are sent in the clear, be aware!
 
-You’ll need to install the following libraries via the Arduino [library manager](https://docs.arduino.cc/software/ide-v2/tutorials/ide-v2-installing-a-library) to build the application. Also install the library dependencies when the Arduino IDE asks for it.
+SynoPaperCal only works on the Paperd.Ink Classic. The Merlot is not supported (I don’t own one). Open an [issue](https://github.com/cimm/synopapercal/issues) if you would like to see support for the Paperd.Ink Merlot.
 
-- GxEPD2 by Jean-Marc Zingg
-- ArduinoJSON by Benoit Blanchon
+## Installation
 
-## Limitations
+You can use the Arduino IDE to compile and upload the sketch, but I prefer the [arduino-cli](https://arduino.github.io/arduino-cli/0.29/). First clone this git repository:
 
-- Only works on Paperd.Ink Classic devices. The Merlot is not supported since I don’t have one to test on.
-- Does not support TLS for now.
-- Does not support recurring events for now.
+```sh
+$ git clone https://github.com/cimm/synopapercal.git --depth 1
+```
+
+Don’t forget to add you WiFi and Synology credentials to the sketch’ `synopapercal/config.hpp` file.
+
+Next install and configure arduino-cli for the ESP32 board, add the required Arduino libraries:
+
+```sh
+$ arduino-cli config init
+$ arduino-cli config set board_manager.additional_urls https://dl.espressif.com/dl/package_esp32_index.json
+$ arduino-cli core update-index
+$ arduino-cli core install esp32:esp32
+$ arduino-cli lib install ArduinoJson
+$ arduino-cli lib install GxEPD2
+```
+
+Finaly, compile and upload the sketch:
+
+```sh
+$ arduino-cli compile --fqbn esp32:esp32:esp32 synopapercal/
+$ arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32 synopapercal/
+```
+
+The board will reboot, give it a few seconds, and if everything works you shoud see your upcoming events.
+
+Use the Arduino Serial Monitor extra debug info:
+
+```sh
+$ arduino-cli monitor -p /dev/ttyUSB0
+```
+
+## Acknowledgement
+
+A good chunk of the code is inspired on the official [Paperd.Ink Library for Arduino](https://github.com/paperdink/PaperdInk-Library).
