@@ -1,7 +1,7 @@
 // Display pins
+#define EPD_BUSY 34
 #define EPD_CS   22
 #define EPD_DC   15
-#define EPD_BUSY 34
 #define EPD_EN   12
 #define EPD_RST  13
 
