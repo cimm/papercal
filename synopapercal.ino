@@ -71,7 +71,8 @@ void events_to_display() {
     time_t next_day_timestamp = mktime(&now) + (24 * 60 * 60);  // add 1 day in seconds
     start = *localtime(&next_day_timestamp);
     start.tm_hour = 0;  // beginning of day
-    start.tm_min = 1;
+    start.tm_min = 0;
+    start.tm_sec = 1;
   }
 
   title_to_display(start);
@@ -82,6 +83,7 @@ void events_to_display() {
   end.tm_mday = start.tm_mday;
   end.tm_hour = 23;
   end.tm_min = 59;
+  end.tm_sec = 59;
 
   device_display.panel.setTextColor(GxEPD_BLACK);
   device_display.panel.setTextSize(2);

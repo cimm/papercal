@@ -1,7 +1,8 @@
 /*
   Gets events from a Synology Calendar via the Synology API.
-  API documentation: https://global.download.synology.com/download/Document/Software/DeveloperGuide/Package/Calendar/2.4/enu/Synology_Calendar_API_Guide_enu.pdf
-  Synology error codes: https://github.com/ProtoThis/python-synology/blob/master/src/synology_dsm/const.py
+
+  - https://global.download.synology.com/download/Document/Software/DeveloperGuide/Package/Calendar/2.4/enu/Synology_Calendar_API_Guide_enu.pdf
+  - https://github.com/ProtoThis/python-synology/blob/master/src/synology_dsm/const.py
 */
 
 #include <HTTPClient.h>
@@ -13,6 +14,16 @@ class SynoCalendar {
   String _synotoken;
   int _auth_max_api_version;
   int _event_max_api_version;
+
+  time_t utc_timestamp(tm time_info) {  // tm is not time zone aware
+    char* tz = getenv("TZ");
+    char* prev_time_zone = new char[strlen(tz) + 1];
+    strcpy(prev_time_zone, tz);
+    setenv("TZ", "UTC0", 1);
+    time_t utc_timestamp = mktime(&time_info);
+    setenv("TZ", prev_time_zone, 1);
+    return utc_timestamp;
+  }
 
 public:
   String last_error_message = "";
@@ -50,14 +61,14 @@ public:
 
   JsonArrayConst events(char* cal_id, tm start, tm end, size_t capacity, bool repeat = true) {  // capacity is the JSON doc memory to reserve
     last_error_message = "";
-    String url_buf = "{api}/entry.cgi?version={ver}&cal_id_list=['{cal_id}']&start={start}&end={end}&list_repeat={repeat}&api=SYNO.Cal.Event&method=list&_sid={sid}";  // start & and are unix timestamps
+    String url_buf = "{api}/entry.cgi?version={ver}&cal_id_list=['{cal_id}']&start={start}&end={end}&list_repeat={repeat}&api=SYNO.Cal.Event&method=list&_sid={sid}";  // start & and are unix timestamps in UTC
     url_buf.replace("{api}", _webapi_url);
     url_buf.replace("{ver}", String(_event_max_api_version));
     url_buf.replace("{cal_id}", cal_id);
-    time_t start_timestamp = mktime(&start);
-    url_buf.replace("{start}", String(start_timestamp));
-    time_t end_timestamp = mktime(&end);
-    url_buf.replace("{end}", String(end_timestamp));
+    time_t start_utc_timestamp = utc_timestamp(start);
+    url_buf.replace("{start}", String(start_utc_timestamp));
+    time_t end_utc_timestamp = utc_timestamp(end);
+    url_buf.replace("{end}", String(end_utc_timestamp));
     if (repeat) {
       url_buf.replace("{repeat}", "true");  // FIXME Returns weird results that fall outside of the date range
     } else {
