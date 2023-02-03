@@ -70,7 +70,7 @@ public:
     time_t end_utc_timestamp = utc_timestamp(end);
     url_buf.replace("{end}", String(end_utc_timestamp));
     if (repeat) {
-      url_buf.replace("{repeat}", "true");  // FIXME Returns weird results that fall outside of the date range
+      url_buf.replace("{repeat}", "true");  // FIXME Returns all repeating events, every, single, repeating event in the whole calendar
     } else {
       url_buf.replace("{repeat}", "false");
     }
