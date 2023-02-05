@@ -5,7 +5,7 @@
 
 class PaperDatetime {
 public:
-  struct tm time_info;
+  tm time_info;
 
   void fetch(const char* time_zone, const char* ntp_pool = "pool.ntp.org") {
     configTzTime(time_zone, ntp_pool);

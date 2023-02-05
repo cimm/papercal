@@ -12,8 +12,8 @@ class Calendar {
   std::string _password;
   std::string _calendar_url;
 
-  std::string utc_xml_formatted(tm time_info) {
-    time_t utc_timestamp = mktime(&time_info);
+  std::string utc_xml_formatted(tm local_time_info) {
+    time_t utc_timestamp = mktime(&local_time_info);
     tm utc_time_info = *gmtime(&utc_timestamp);
     char formatted[17];
     strftime(formatted, 17, "%Y%m%dT%H%M%SZ", &utc_time_info);

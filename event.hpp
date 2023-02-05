@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sstream>
+#include <time.h>
 
 class Event {
   std::string _raw;
@@ -20,15 +21,16 @@ class Event {
     return "";
   }
 
-  tm to_time_info(std::string vcard_datetime) {
-    struct tm time_info = { 0 };
-    time_info.tm_year = std::atoi(vcard_datetime.substr(0, 4).c_str()) - 1900;
-    time_info.tm_mon = std::atoi(vcard_datetime.substr(4, 2).c_str()) - 1;
-    time_info.tm_mday = std::atoi(vcard_datetime.substr(6, 2).c_str());
-    time_info.tm_hour = std::atoi(vcard_datetime.substr(9, 2).c_str());
-    time_info.tm_min = std::atoi(vcard_datetime.substr(11, 2).c_str());
-    time_info.tm_sec = std::atoi(vcard_datetime.substr(13, 2).c_str());
-    return time_info;
+  tm to_time_info(std::string datetime) {  // rfc5545 datetime in UTC
+    tm utc_time_info = { 0 };
+    utc_time_info.tm_year = std::atoi(datetime.substr(0, 4).c_str()) - 1900;
+    utc_time_info.tm_mon = std::atoi(datetime.substr(4, 2).c_str()) - 1;
+    utc_time_info.tm_mday = std::atoi(datetime.substr(6, 2).c_str());
+    utc_time_info.tm_hour = std::atoi(datetime.substr(9, 2).c_str());
+    utc_time_info.tm_min = std::atoi(datetime.substr(11, 2).c_str());
+    utc_time_info.tm_sec = std::atoi(datetime.substr(13, 2).c_str());
+    time_t utc_timestamp = mktime(&utc_time_info) - _timezone;  // timegm not implemented on esp32
+    return *localtime(&utc_timestamp);
   }
 
 public:
@@ -42,7 +44,7 @@ public:
 
   std::string formatted_start(std::string fmt) {
     std::string attr = property("VEVENT", "DTSTART");
-    struct tm time_info = to_time_info(attr);
+    tm time_info = to_time_info(attr);
     char formatted[100];
     strftime(formatted, sizeof(formatted), fmt.c_str(), &time_info);
     std::string str = formatted;

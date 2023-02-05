@@ -54,8 +54,8 @@ void refresh_display() {
 }
 
 void events_to_display() {
-  struct tm now = device_datetime.time_info;
-  struct tm start = now;
+  tm now = device_datetime.time_info;
+  tm start = now;
   if (now.tm_hour >= SHOW_NEXT_DAY_FROM_HOUR) {
     time_t next_day_timestamp = mktime(&now) + (24 * 60 * 60);  // add 1 day in seconds
     start = *localtime(&next_day_timestamp);
@@ -63,7 +63,7 @@ void events_to_display() {
     start.tm_min = 0;
     start.tm_sec = 1;
   }
-  struct tm end = { 0 };
+  tm end = { 0 };
   end.tm_year = start.tm_year;
   end.tm_mon = start.tm_mon;
   end.tm_mday = start.tm_mday;
@@ -105,7 +105,7 @@ void event_to_display(Event event) {
   device_display.panel.println(summary.c_str());
 }
 
-void title_to_display(struct tm time_info) {
+void title_to_display(tm time_info) {
   char formatted_date[11];
   strftime(formatted_date, 11, "%a %e %b", &time_info);
   device_display.panel.fillRect(0, 0, device_display.panel.width(), 8 * padding, GxEPD_BLACK);
