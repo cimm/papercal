@@ -1,8 +1,8 @@
 # SynoPaperCal
 
-SynoPaperCal is a calendar application for [Paperd.Ink](https://paperd.ink/) Classic devices. It connects to a [Synology Calendar](https://www.synology.com/en-us/dsm/feature/calendar) and displays the upcoming events.
+SynoPaperCal is a calendar application for [Paperd.Ink](https://paperd.ink/) Classic devices. It connects to a [CalDAV](https://en.wikipedia.org/wiki/CalDAV) calendar and displays the upcoming events.
 
-SynoPaperCal is under active development, it kind of works for me but is not production ready software. It does not support HTTPS yet, so your Synology username and password are sent in the clear, be aware!
+SynoPaperCal is under active development, it kind of works for me but is not production ready software.
 
 SynoPaperCal only works on the Paperd.Ink Classic. The Merlot is not supported (I don’t own one). Open an [issue](https://github.com/cimm/synopapercal/issues) if you would like to see support for the Paperd.Ink Merlot.
 
@@ -23,7 +23,6 @@ $ arduino-cli config init
 $ arduino-cli config set board_manager.additional_urls https://dl.espressif.com/dl/package_esp32_index.json
 $ arduino-cli core update-index
 $ arduino-cli core install esp32:esp32
-$ arduino-cli lib install ArduinoJson
 $ arduino-cli lib install GxEPD2
 ```
 
@@ -44,4 +43,4 @@ $ arduino-cli monitor -p /dev/ttyUSB0
 
 ## Acknowledgement
 
-A good chunk of the code is inspired on the official [Paperd.Ink Library for Arduino](https://github.com/paperdink/PaperdInk-Library).
+A good chunk of the code is inspired on the official [Paperd.Ink Library for Arduino](https://github.com/paperdink/PaperdInk-Library). Besides the libraries above, it also includes a copy of the [TinyXML2](https://github.com/leethomason/tinyxml2) parser.

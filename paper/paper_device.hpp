@@ -1,3 +1,5 @@
+#pragma once
+
 #define BUTTON_1_PIN 14
 
 class PaperDevice {

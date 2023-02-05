@@ -1,7 +1,4 @@
-/*
-  Gets the current date and time from an NTP server and can format the result.
-  Requires an active WiFi network connection.
-*/
+#pragma once
 
 #include <WiFi.h>
 #include <time.h>

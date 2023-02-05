@@ -1,6 +1,4 @@
-/* 
-  Connects or disconnects a WiFi network.
-*/
+#pragma once
 
 #include <WiFi.h>
 

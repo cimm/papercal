@@ -1,3 +1,5 @@
+#pragma once
+
 // Display pins
 #define EPD_BUSY 34
 #define EPD_CS   22

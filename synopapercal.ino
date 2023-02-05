@@ -3,12 +3,12 @@
 #include "paper/paper_device.hpp"
 #include "paper/paper_display.hpp"
 #include "paper/paper_wifi.hpp"
-#include "syno/syno_calendar.hpp"
-#include "syno/syno_event.hpp"
+#include "calendar.hpp"
+#include "event.hpp"
 
-#include <ArduinoJson.h>
 #include <GxEPD2_BW.h>
 #include <time.h>
+#include <vector>
 
 const int padding = 5;
 PaperDevice device;
@@ -21,6 +21,7 @@ void setup() {
   enable_display();
   connect_wifi();
   fetch_datetime();
+
   events_to_display();
   refresh_datetime_to_display();
   disconnect_wifi();
@@ -53,18 +54,6 @@ void refresh_display() {
 }
 
 void events_to_display() {
-  SynoCalendar cal(SYNOLOGY_WEBAPI);
-  if (cal.error()) {
-    error_to_display(cal.last_error_message.c_str());
-    return;
-  }
-
-  cal.authenticate(SYNOLOGY_ACCOUNT, SYNOLOGY_PASSWORD);
-  if (cal.error()) {
-    error_to_display(cal.last_error_message.c_str());
-    return;
-  }
-
   struct tm now = device_datetime.time_info;
   struct tm start = now;
   if (now.tm_hour >= SHOW_NEXT_DAY_FROM_HOUR) {
@@ -74,9 +63,6 @@ void events_to_display() {
     start.tm_min = 0;
     start.tm_sec = 1;
   }
-
-  title_to_display(start);
-
   struct tm end = { 0 };
   end.tm_year = start.tm_year;
   end.tm_mon = start.tm_mon;
@@ -85,30 +71,34 @@ void events_to_display() {
   end.tm_min = 59;
   end.tm_sec = 59;
 
+  title_to_display(start);
+
+  Calendar cal(CALENDAR_USER, CALENDAR_PASSWORD, CALENDAR_URL);
+  std::vector<Event> events = cal.events(start, end);
+  if (cal.error()) {
+    error_to_display(cal.last_error_message.c_str());
+    return;
+  }
+
   device_display.panel.setTextColor(GxEPD_BLACK);
   device_display.panel.setTextSize(2);
   device_display.panel.setCursor(0, 10 * padding);
-  JsonArrayConst events = cal.events(SYNOLOGY_CALENDAR_ID, start, end, 1024 * 30, false);  // TODO How do we know how much memory is needed?
   if (cal.error()) {
     error_to_display(cal.last_error_message.c_str());
   } else {
-    for (JsonVariantConst event : events) {
+    for (Event event : events) {
       event_to_display(event);
     }
   }
-
-  cal.logout();
 }
 
-void event_to_display(SynoEvent event) {
-  device_display.panel.print(" ");
+void event_to_display(Event event) {
   char formatted_start[8];
-  event.formatted_start("%H:%M", formatted_start, sizeof(formatted_start));
-  device_display.panel.print(formatted_start);
+  device_display.panel.print(event.formatted_start("%H:%M").c_str());
   device_display.panel.print(" ");
-  String summary = event.summary();
-  if (summary.length() > 24) { summary = summary.substring(0, 24) + "-"; }
-  device_display.panel.println(summary);
+  std::string summary = event.summary();
+  if (summary.length() > 24) { summary = summary.substr(0, 25) + "-"; }
+  device_display.panel.println(summary.c_str());
 }
 
 void title_to_display(struct tm time_info) {
