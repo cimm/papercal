@@ -94,7 +94,11 @@ void events_to_display() {
 
 void event_to_display(Event event) {
   char formatted_start[8];
-  device_display.panel.print(event.formatted_start("%H:%M").c_str());
+  if (event.is_all_day()) {
+    device_display.panel.print("     ");
+  } else {
+    device_display.panel.print(event.formatted_start("%H:%M").c_str());
+  }
   device_display.panel.print(" ");
   std::string summary = event.summary();
   if (summary.length() > 24) { summary = summary.substr(0, 25) + "-"; }

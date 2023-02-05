@@ -9,7 +9,10 @@ class Event {
     std::stringstream raw_stream(_raw);
     std::string line;
     while (getline(raw_stream, line, '\n')) {
-      if (starts_with(line, attribute)) { return line; }
+      if (starts_with(line, attribute)) {
+        int index = attribute.length() + 1;  // include colon
+        return line.substr(index, -1);
+      }
     }
     return "";
   }
@@ -35,16 +38,23 @@ public:
   }
 
   std::string summary() {
-    std::string attr = attribute("SUMMARY");
-    return attr.substr(8, -1);
+    return attribute("SUMMARY");
   }
 
   std::string formatted_start(std::string fmt) {
     std::string attr = attribute("DTSTART");
-    struct tm time_info = to_time_info(attr.substr(8, -1));
+    struct tm time_info = to_time_info(attr);
     char formatted[100];
     strftime(formatted, sizeof(formatted), fmt.c_str(), &time_info);
     std::string str = formatted;
     return str;
+  }
+
+  std::string duration() {
+    return attribute("DURATION");
+  }
+
+  bool is_all_day() {
+    return duration() == "P1D";
   }
 };
