@@ -5,20 +5,19 @@
 class Event {
   std::string _raw;
 
-  std::string attribute(std::string attribute) {
+  std::string property(std::string component, std::string property) {
     std::stringstream raw_stream(_raw);
     std::string line;
+    bool in_component = false;
+    int property_value_index = property.length() + 1;  // include colon
     while (getline(raw_stream, line, '\n')) {
-      if (starts_with(line, attribute)) {
-        int index = attribute.length() + 1;  // include colon
-        return line.substr(index, -1);
+      if (in_component && line.find(property) != std::string::npos) {
+        return line.substr(property_value_index, -1);
       }
+      if (line.find("BEGIN:" + component) != std::string::npos) { in_component = true; }
+      if (line.find("END:" + component) != std::string::npos) { break; }
     }
     return "";
-  }
-
-  bool starts_with(std::string source, std::string prefix) {
-    return (source.rfind(prefix, 0) == 0) ? true : false;
   }
 
   tm to_time_info(std::string vcard_datetime) {
@@ -38,11 +37,11 @@ public:
   }
 
   std::string summary() {
-    return attribute("SUMMARY");
+    return property("VEVENT", "SUMMARY");
   }
 
   std::string formatted_start(std::string fmt) {
-    std::string attr = attribute("DTSTART");
+    std::string attr = property("VEVENT", "DTSTART");
     struct tm time_info = to_time_info(attr);
     char formatted[100];
     strftime(formatted, sizeof(formatted), fmt.c_str(), &time_info);
@@ -51,7 +50,7 @@ public:
   }
 
   std::string duration() {
-    return attribute("DURATION");
+    return property("VEVENT", "DURATION");
   }
 
   bool is_all_day() {
