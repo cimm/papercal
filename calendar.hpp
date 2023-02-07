@@ -49,7 +49,6 @@ public:
     HTTPClient http;
     http.begin(_calendar_url.c_str());
     http.setAuthorization(_user.c_str(), _password.c_str());
-    http.addHeader("Content-Type", "application/xml");
     int response_code = http.sendRequest("PROPFIND", "");
     http.end();
     if (response_code == HTTP_CODE_MULTI_STATUS) { return true; }
@@ -61,7 +60,6 @@ public:
     last_error_message.clear();
     std::stringstream query_stream;
     query_stream
-      << "<?xml version='1.0' encoding='utf-8' ?>"
       << "<C:calendar-query xmlns:D='DAV:' xmlns:C='urn:ietf:params:xml:ns:caldav'>"
       << "  <D:prop>"
       << "    <C:calendar-data>"
@@ -81,7 +79,6 @@ public:
     HTTPClient http;
     http.begin(_calendar_url.c_str());
     http.setAuthorization(_user.c_str(), _password.c_str());
-    http.addHeader("Content-Type", "application/xml");
     int response_code = http.sendRequest("REPORT", query.c_str());
     std::vector<Event> events;
     if (response_code == HTTP_CODE_MULTI_STATUS) {
