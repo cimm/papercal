@@ -41,6 +41,12 @@ Use the Arduino Serial Monitor extra debug info:
 $ arduino-cli monitor -p /dev/ttyUSB0
 ```
 
+## Known Issues
+
+- All day events also show on the day after the event, this is a bug.
+- Only the [Synology Calendar](https://www.synology.com/en-us/dsm/feature/calendar) CalDAV implementation is tested. File a bug if your CalDAV server does not work.
+- Only ASCII is supported. Full UTF-8 support would take too much of the program storage space.
+
 ## Acknowledgement
 
 A good chunk of the code is inspired on the official [Paperd.Ink Library for Arduino](https://github.com/paperdink/PaperdInk-Library). Besides the libraries above, it also includes a copy of the [TinyXML2](https://github.com/leethomason/tinyxml2) parser.
