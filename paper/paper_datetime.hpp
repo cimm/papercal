@@ -13,8 +13,4 @@ public:
       delay(500);
     }
   }
-
-  void format(const char* fmt, char* out_formatted, size_t out_length) {
-    strftime(out_formatted, 100, fmt, &time_info);
-  }
 };

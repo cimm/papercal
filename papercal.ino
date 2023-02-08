@@ -17,14 +17,16 @@ PaperDevice device;
 PaperDisplay device_display;
 PaperWifi device_wifi;
 PaperDatetime device_datetime;
+tm _today = { 0 };
+tm _tomorrow = { 0 };
 
 void setup() {
   Serial.begin(9600);
   enable_display();
   connect_wifi();
-  fetch_datetime();
-
-  events_to_display();
+  set_datetimes();
+  events_to_display(_today);
+  events_to_display(_tomorrow);
   refresh_datetime_to_display();
   disconnect_wifi();
   refresh_display();
@@ -41,58 +43,47 @@ void disconnect_wifi() {
   device_wifi.disconnect();
 }
 
-void fetch_datetime() {
+void set_datetimes() {
   device_datetime.fetch(TIME_ZONE, NTP_POOL);
+  _today = device_datetime.time_info;
+  time_t next_day_timestamp = mktime(&_today) + (24 * 3600);  // add 1 day in seconds
+  _tomorrow = *localtime(&next_day_timestamp);
+  _tomorrow.tm_hour = 0;  // beginning of day
+  _tomorrow.tm_min = 0;
+  _tomorrow.tm_sec = 1;
 }
 
 void enable_display() {
   device_display.enable_display();
   device_display.panel.fillScreen(GxEPD_WHITE);
   device_display.panel.setTextColor(GxEPD_BLACK);
+  device_display.panel.setCursor(0, 15);  // top margin
 }
 
 void refresh_display() {
   device_display.panel.display();
 }
 
-void events_to_display() {
-  tm now = device_datetime.time_info;
-  tm start = now;
-  if (now.tm_hour >= SHOW_NEXT_DAY_FROM_HOUR) {
-    time_t next_day_timestamp = mktime(&now) + (24 * 60 * 60);  // add 1 day in seconds
-    start = *localtime(&next_day_timestamp);
-    start.tm_hour = 0;  // beginning of day
-    start.tm_min = 0;
-    start.tm_sec = 1;
-  }
-  tm end = { 0 };
-  end.tm_year = start.tm_year;
-  end.tm_mon = start.tm_mon;
-  end.tm_mday = start.tm_mday;
-  end.tm_hour = 23;
-  end.tm_min = 59;
-  end.tm_sec = 59;
-
-  title_to_display(start);
-
+void events_to_display(tm start) {
   Calendar cal(CALENDAR_USER, CALENDAR_PASSWORD, CALENDAR_URL);
-  std::vector<Event> events = cal.events(start, end);
+  std::vector<Event> events = cal.events(start);
   if (cal.error()) {
     error_to_display(cal.last_error_message.c_str());
     return;
   }
-
-  device_display.panel.setFont(&FreeSans12pt7b);
   if (cal.error()) {
     error_to_display(cal.last_error_message.c_str());
   } else {
+    day_to_display(start);
     for (Event event : events) {
       event_to_display(event);
     }
   }
+  device_display.panel.println("");
 }
 
 void event_to_display(Event event) {
+  device_display.panel.setFont(&FreeSans12pt7b);
   char formatted_start[8];
   if (!event.is_all_day()) {
     device_display.panel.print(event.formatted_start("%H:%M").c_str());
@@ -103,10 +94,9 @@ void event_to_display(Event event) {
   device_display.panel.println(summary.c_str());
 }
 
-void title_to_display(tm time_info) {
+void day_to_display(tm time_info) {
   char formatted_date[11];
-  strftime(formatted_date, 11, "%a %e %b", &time_info);
-  device_display.panel.setCursor(0, 15);
+  strftime(formatted_date, sizeof(formatted_date), "%a %e %b", &time_info);
   device_display.panel.setFont(&FreeSansBold12pt7b);
   device_display.panel.println(formatted_date);
 }
@@ -119,12 +109,12 @@ void error_to_display(const char* error_message) {
 }
 
 void refresh_datetime_to_display() {
-  char formatted_refresh_date[30];
-  device_datetime.format("%d/%m %H:%M", formatted_refresh_date, sizeof(formatted_refresh_date));
+  char formatted_date[12];
+  strftime(formatted_date, sizeof(formatted_date), "%d/%m %H:%M", &_today);
   device_display.panel.setFont();
   device_display.panel.setTextSize(1);
   device_display.panel.setCursor(device_display.panel.width() - 65 - padding, device_display.panel.height() - 2 * padding);
-  device_display.panel.print(formatted_refresh_date);
+  device_display.panel.print(formatted_date);
 }
 
 void deep_sleep() {

@@ -56,20 +56,27 @@ public:
     return false;
   }
 
-  std::vector<Event> events(tm start, tm end) {
+  std::vector<Event> events(tm start) {
     last_error_message.clear();
+    tm end_of_day = { 0 };
+    end_of_day.tm_year = start.tm_year;
+    end_of_day.tm_mon = start.tm_mon;
+    end_of_day.tm_mday = start.tm_mday;
+    end_of_day.tm_hour = 23;
+    end_of_day.tm_min = 59;
+    end_of_day.tm_sec = 59;
     std::stringstream query_stream;
     query_stream
       << "<C:calendar-query xmlns:D='DAV:' xmlns:C='urn:ietf:params:xml:ns:caldav'>"
       << "  <D:prop>"
       << "    <C:calendar-data>"
-      << "      <C:expand start='" << utc_xml_formatted(start) << "' end='" << utc_xml_formatted(end) << "'/>"
+      << "      <C:expand start='" << utc_xml_formatted(start) << "' end='" << utc_xml_formatted(end_of_day) << "'/>"
       << "    </C:calendar-data>"
       << "  </D:prop>"
       << "  <C:filter>"
       << "    <C:comp-filter name='VCALENDAR'>"
       << "      <C:comp-filter name='VEVENT'>"
-      << "        <C:time-range start='" << utc_xml_formatted(start) << "' end='" << utc_xml_formatted(end) << "'/>"
+      << "        <C:time-range start='" << utc_xml_formatted(start) << "' end='" << utc_xml_formatted(end_of_day) << "'/>"
       << "      </C:comp-filter>"
       << "    </C:comp-filter>"
       << "  </C:filter>"
