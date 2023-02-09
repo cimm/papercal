@@ -52,7 +52,7 @@ public:
     int response_code = http.sendRequest("PROPFIND", "");
     http.end();
     if (response_code == HTTP_CODE_MULTI_STATUS) { return true; }
-    last_error_message = "Invalid calendar URL";
+    last_error_message = "Calendar not found";
     return false;
   }
 

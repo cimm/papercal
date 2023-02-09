@@ -66,6 +66,10 @@ void refresh_display() {
 
 void events_to_display(tm start) {
   Calendar cal(CALENDAR_USER, CALENDAR_PASSWORD, CALENDAR_URL);
+  if (!cal.is_valid()) {
+    error_to_display(cal.last_error_message.c_str());
+    return;
+  }
   std::vector<Event> events = cal.events(start);
   if (cal.error()) {
     error_to_display(cal.last_error_message.c_str());
