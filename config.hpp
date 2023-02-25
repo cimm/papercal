@@ -9,5 +9,8 @@
 #define CALENDAR_PASSWORD "password"
 #define CALENDAR_URL "https://synology:5001/caldav/user/calid/" // Click chevron next to calendar name in webview → CALDav Account → Thunderbird
 
+// Date & time
 #define TIME_ZONE "CET-1CEST,M3.5.0,M10.5.0/3"  // See https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv
 #define NTP_POOL "pool.ntp.org"
+
+#define REFRESH_ON_ERROR true  // Keep old events on screen if there is an error? No error messages will be shown on the display.

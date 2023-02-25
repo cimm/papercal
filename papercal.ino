@@ -17,16 +17,17 @@ PaperDevice device;
 PaperDisplay device_display;
 PaperWifi device_wifi;
 PaperDatetime device_datetime;
-tm _today = { 0 };
-tm _tomorrow = { 0 };
+bool error = false;
+tm today = { 0 };
+tm tomorrow = { 0 };
 
 void setup() {
   Serial.begin(9600);
   enable_display();
   connect_wifi();
   set_datetimes();
-  events_to_display(_today);
-  events_to_display(_tomorrow);
+  events_to_display(today);
+  events_to_display(tomorrow);
   refresh_datetime_to_display();
   disconnect_wifi();
   refresh_display();
@@ -45,12 +46,12 @@ void disconnect_wifi() {
 
 void set_datetimes() {
   device_datetime.fetch(TIME_ZONE, NTP_POOL);
-  _today = device_datetime.time_info;
-  time_t next_day_timestamp = mktime(&_today) + (24 * 3600);  // add 1 day in seconds
-  _tomorrow = *localtime(&next_day_timestamp);
-  _tomorrow.tm_hour = 0;  // beginning of day
-  _tomorrow.tm_min = 0;
-  _tomorrow.tm_sec = 1;
+  today = device_datetime.time_info;
+  time_t next_day_timestamp = mktime(&today) + (24 * 3600);  // add 1 day in seconds
+  tomorrow = *localtime(&next_day_timestamp);
+  tomorrow.tm_hour = 0;  // beginning of day
+  tomorrow.tm_min = 0;
+  tomorrow.tm_sec = 1;
 }
 
 void enable_display() {
@@ -61,29 +62,28 @@ void enable_display() {
 }
 
 void refresh_display() {
-  device_display.panel.display();
+  if (error && !REFRESH_ON_ERROR) {
+    Serial.println("Error and REFRESH_ON_ERROR is false: will not refresh display!");
+  } else {
+    device_display.panel.display();
+  }
 }
 
 void events_to_display(tm start) {
   Calendar cal(CALENDAR_USER, CALENDAR_PASSWORD, CALENDAR_URL);
   if (!cal.is_valid()) {
-    error_to_display(cal.last_error_message.c_str());
+    set_error(cal.last_error_message.c_str());
     return;
   }
   std::vector<Event> events = cal.events(start);
   if (cal.error()) {
-    error_to_display(cal.last_error_message.c_str());
+    set_error(cal.last_error_message.c_str());
     return;
   }
-  if (cal.error()) {
-    error_to_display(cal.last_error_message.c_str());
-  } else {
-    day_to_display(start);
-    for (Event event : events) {
-      event_to_display(event);
-    }
+  day_to_display(start);
+  for (Event event : events) {
+    event_to_display(event);
   }
-  device_display.panel.println("");
 }
 
 void event_to_display(Event event) {
@@ -105,7 +105,8 @@ void day_to_display(tm time_info) {
   device_display.panel.println(formatted_date);
 }
 
-void error_to_display(const char* error_message) {
+void set_error(const char* error_message) {
+  error = true;
   device_display.panel.setFont();
   device_display.panel.setTextSize(1);
   device_display.panel.setCursor(padding, device_display.panel.height() - 2 * padding);
@@ -114,7 +115,7 @@ void error_to_display(const char* error_message) {
 
 void refresh_datetime_to_display() {
   char formatted_date[12];
-  strftime(formatted_date, sizeof(formatted_date), "%d/%m %H:%M", &_today);
+  strftime(formatted_date, sizeof(formatted_date), "%d/%m %H:%M", &today);
   device_display.panel.setFont();
   device_display.panel.setTextSize(1);
   device_display.panel.setCursor(device_display.panel.width() - 65 - padding, device_display.panel.height() - 2 * padding);
