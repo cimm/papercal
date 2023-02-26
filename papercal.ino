@@ -5,18 +5,17 @@
 #include "paper/paper_wifi.hpp"
 #include "calendar.hpp"
 #include "event.hpp"
+#include "ui.hpp"
 
-#include <GxEPD2_BW.h>
 #include <time.h>
 #include <vector>
-#include <Fonts/FreeSans12pt7b.h>
-#include <Fonts/FreeSansBold12pt7b.h>
 
 const int padding = 5;
 PaperDevice device;
 PaperDisplay device_display;
 PaperWifi device_wifi;
 PaperDatetime device_datetime;
+UI ui(&device_display);
 bool error = false;
 tm today = { 0 };
 tm tomorrow = { 0 };
@@ -25,7 +24,7 @@ void setup() {
   Serial.begin(9600);
   enable_display();
   connect_wifi();
-  set_datetimes();
+  get_datetimes();
   events_to_display(today);
   events_to_display(tomorrow);
   refresh_datetime_to_display();
@@ -44,7 +43,7 @@ void disconnect_wifi() {
   device_wifi.disconnect();
 }
 
-void set_datetimes() {
+void get_datetimes() {
   device_datetime.fetch(TIME_ZONE, NTP_POOL);
   today = device_datetime.time_info;
   time_t next_day_timestamp = mktime(&today) + (24 * 3600);  // add 1 day in seconds
@@ -56,9 +55,7 @@ void set_datetimes() {
 
 void enable_display() {
   device_display.enable_display();
-  device_display.panel.fillScreen(GxEPD_WHITE);
-  device_display.panel.setTextColor(GxEPD_BLACK);
-  device_display.panel.setCursor(0, 15);  // top margin
+  ui.reset();
 }
 
 void refresh_display() {
@@ -87,39 +84,31 @@ void events_to_display(tm start) {
 }
 
 void event_to_display(Event event) {
-  device_display.panel.setFont(&FreeSans12pt7b);
-  char formatted_start[8];
+  std::string start = "";
   if (!event.is_all_day()) {
-    device_display.panel.print(event.formatted_start("%H:%M").c_str());
-    device_display.panel.print(" ");
+    char formatted_start[8];
+    start = event.formatted_start("%H:%M");
   }
   std::string summary = event.summary();
   if (summary.length() > 24) { summary = summary.substr(0, 26) + "-"; }
-  device_display.panel.println(summary.c_str());
+  ui.row(start, summary);
 }
 
 void day_to_display(tm time_info) {
   char formatted_date[11];
   strftime(formatted_date, sizeof(formatted_date), "%a %e %b", &time_info);
-  device_display.panel.setFont(&FreeSansBold12pt7b);
-  device_display.panel.println(formatted_date);
+  ui.row("", formatted_date, true);
 }
 
 void set_error(const char* error_message) {
   error = true;
-  device_display.panel.setFont();
-  device_display.panel.setTextSize(1);
-  device_display.panel.setCursor(padding, device_display.panel.height() - 2 * padding);
-  device_display.panel.print(error_message);
+  ui.footer_left(error_message);
 }
 
 void refresh_datetime_to_display() {
   char formatted_date[12];
   strftime(formatted_date, sizeof(formatted_date), "%d/%m %H:%M", &today);
-  device_display.panel.setFont();
-  device_display.panel.setTextSize(1);
-  device_display.panel.setCursor(device_display.panel.width() - 65 - padding, device_display.panel.height() - 2 * padding);
-  device_display.panel.print(formatted_date);
+  ui.footer_right(formatted_date);
 }
 
 void deep_sleep() {
