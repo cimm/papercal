@@ -42,9 +42,13 @@ public:
     return property("VEVENT", "SUMMARY");
   }
 
-  std::string formatted_start(std::string fmt) {
+  tm start() {
     std::string attr = property("VEVENT", "DTSTART");
-    tm time_info = to_time_info(attr);
+    return to_time_info(attr);
+  }
+
+  std::string formatted_start(std::string fmt) {
+    tm time_info = start();
     char formatted[100];
     strftime(formatted, sizeof(formatted), fmt.c_str(), &time_info);
     std::string str = formatted;

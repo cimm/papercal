@@ -31,6 +31,12 @@ class Calendar {
     return events;
   }
 
+  static bool by_start(Event event1, Event event2) {
+    tm start1 = event1.start();
+    tm start2 = event2.start();
+    return (mktime(&start1) < mktime(&start2));
+  }
+
 public:
   std::string last_error_message;
 
@@ -94,6 +100,7 @@ public:
     }
     http.end();
     if (events.empty()) { last_error_message = "Calendar found no events"; }
+    sort(events.begin(), events.end(), by_start);
     return events;
   }
 };
