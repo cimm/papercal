@@ -26,9 +26,11 @@ class Event {
     utc_time_info.tm_year = std::atoi(datetime.substr(0, 4).c_str()) - 1900;
     utc_time_info.tm_mon = std::atoi(datetime.substr(4, 2).c_str()) - 1;
     utc_time_info.tm_mday = std::atoi(datetime.substr(6, 2).c_str());
-    utc_time_info.tm_hour = std::atoi(datetime.substr(9, 2).c_str());
-    utc_time_info.tm_min = std::atoi(datetime.substr(11, 2).c_str());
-    utc_time_info.tm_sec = std::atoi(datetime.substr(13, 2).c_str());
+    if (datetime.size() > 8) {
+      utc_time_info.tm_hour = std::atoi(datetime.substr(9, 2).c_str());
+      utc_time_info.tm_min = std::atoi(datetime.substr(11, 2).c_str());
+      utc_time_info.tm_sec = std::atoi(datetime.substr(13, 2).c_str());
+    }
     time_t utc_timestamp = mktime(&utc_time_info) - _timezone;  // timegm not implemented on esp32
     return *localtime(&utc_timestamp);
   }
@@ -43,7 +45,7 @@ public:
   }
 
   tm start() {
-    std::string attr = property("VEVENT", "DTSTART");
+    std::string attr = (is_all_day()) ? property("VEVENT", "DTSTART;VALUE=DATE") : property("VEVENT", "DTSTART");
     return to_time_info(attr);
   }
 
@@ -59,7 +61,11 @@ public:
     return property("VEVENT", "DURATION");
   }
 
+  bool valid_on(tm day) {  // Synology also returns single all days events the day after, see https://stackoverflow.com/q/75379228
+    return (duration() == "P1D" && start().tm_mday != day.tm_mday) ? false : true;
+  }
+
   bool is_all_day() {
-    return duration() == "P1D";
+    return duration() == "P1D";  // TODO all day events an be longer than 1 day
   }
 };

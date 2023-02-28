@@ -20,13 +20,13 @@ class Calendar {
     return std::string(formatted);
   }
 
-  std::vector<Event> response_payload_to_events(std::string payload) {
+  std::vector<Event> response_payload_to_events(std::string payload, tm start) {
     tinyxml2::XMLDocument doc;
     doc.Parse(payload.c_str());
     std::vector<Event> events;
     for (tinyxml2::XMLElement* child = doc.RootElement()->FirstChildElement(); child != NULL; child = child->NextSiblingElement()) {
       Event event(child->FirstChildElement("propstat")->FirstChildElement("prop")->FirstChildElement("C:calendar-data")->GetText());
-      events.push_back(event);
+      if (event.valid_on(start)) { events.push_back(event); }
     }
     return events;
   }
@@ -96,7 +96,7 @@ public:
     std::vector<Event> events;
     if (response_code == HTTP_CODE_MULTI_STATUS) {
       std::string payload = http.getString().c_str();
-      events = response_payload_to_events(payload);
+      events = response_payload_to_events(payload, start);
     }
     http.end();
     if (events.empty()) { last_error_message = "Calendar found no events"; }
