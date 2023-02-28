@@ -77,6 +77,7 @@ void events_to_display(tm start) {
     set_error(cal.last_error_message.c_str());
     return;
   }
+  if (events.empty()) { return; }
   day_to_display(start);
   for (Event event : events) {
     event_to_display(event);
@@ -102,6 +103,7 @@ void day_to_display(tm time_info) {
 
 void set_error(const char* error_message) {
   error = true;
+  Serial.println(error_message);
   ui.footer_left(error_message);
 }
 

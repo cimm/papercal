@@ -99,7 +99,6 @@ public:
       events = response_payload_to_events(payload, start);
     }
     http.end();
-    if (events.empty()) { last_error_message = "Calendar found no events"; }
     sort(events.begin(), events.end(), by_start);
     return events;
   }
