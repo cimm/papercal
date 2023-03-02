@@ -2,6 +2,7 @@
 #include "paper/paper_datetime.hpp"
 #include "paper/paper_device.hpp"
 #include "paper/paper_display.hpp"
+#include "paper/paper_sound.hpp"
 #include "paper/paper_wifi.hpp"
 #include "calendar.hpp"
 #include "event.hpp"
@@ -12,9 +13,10 @@
 
 const int padding = 5;
 PaperDevice device;
-PaperDisplay device_display;
-PaperWifi device_wifi;
 PaperDatetime device_datetime;
+PaperDisplay device_display;
+PaperSound device_sound;
+PaperWifi device_wifi;
 UI ui(&device_display);
 bool error = false;
 tm today = { 0 };
@@ -104,6 +106,7 @@ void day_to_display(tm time_info) {
 void set_error(const char* error_message) {
   error = true;
   Serial.println(error_message);
+  device_sound.clicks(3);
   ui.footer_left(error_message);
 }
 
