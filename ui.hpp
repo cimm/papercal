@@ -11,9 +11,9 @@ class UI {
   uint16_t _height;
   uint16_t _width;
   uint8_t _current_row = 1;
-  static const uint8_t SIDEBAR_WIDTH = 90;
-  static const uint8_t PADDING = 5;
-  static const uint8_t LINE_HEIGHT = 40;
+  const uint8_t SIDEBAR_WIDTH = 90;
+  const uint8_t PADDING = 5;
+  const uint8_t LINE_HEIGHT = 40;
 
   uint16_t text_width(std::string text) {
     int16_t x, y;

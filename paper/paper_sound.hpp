@@ -4,7 +4,7 @@
 #define PIEZO 26
 
 class PaperSound {
-  long pauze = 300000;  // microseconds
+  const uint16_t PAUZE = 300;  // miliseconds
 
 public:
   PaperSound() {
@@ -18,7 +18,7 @@ public:
       } else {
         digitalWrite(PIEZO, LOW);
       }
-      delayMicroseconds(pauze);
+      delay(PAUZE);
     }
   }
 };

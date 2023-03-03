@@ -10,6 +10,8 @@
 #include <GxEPD2_BW.h>
 
 class PaperDisplay {
+  const uint8_t PAUZE = 50;  // miliseconds
+
 public:
   GxEPD2_BW<GxEPD2_420, GxEPD2_420::HEIGHT> panel = GxEPD2_420(EPD_CS, EPD_DC, EPD_RST, EPD_BUSY);
 
@@ -21,16 +23,16 @@ public:
   void enable_display() {
     digitalWrite(EPD_EN, LOW);
     digitalWrite(EPD_RST, LOW);
-    delay(50);
+    delay(PAUZE);
     digitalWrite(EPD_RST, HIGH);
-    delay(50);
+    delay(PAUZE);
     panel.init();
   }
 
   void disable_display() {
     digitalWrite(EPD_EN, HIGH);
     digitalWrite(EPD_RST, LOW);
-    delay(50);
+    delay(PAUZE);
     digitalWrite(EPD_RST, HIGH);
   }
 };

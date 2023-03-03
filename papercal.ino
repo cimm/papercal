@@ -11,7 +11,6 @@
 #include <time.h>
 #include <vector>
 
-const int padding = 5;
 PaperDevice device;
 PaperDatetime device_datetime;
 PaperDisplay device_display;
