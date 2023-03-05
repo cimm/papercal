@@ -6,6 +6,10 @@ PaperCal is under active development, it kind of works for me but is not product
 
 PaperCal only works on the Paperd.Ink Classic. The Merlot is not supported (I don’t own one). Open an [issue](https://github.com/cimm/papercal/issues) if you would like to see support for the Paperd.Ink Merlot.
 
+<p align="center">
+  <img src="screenshot.webp" alt="Paperd.Ink Classic running PaperCal"/>
+</p>
+
 ## Installation
 
 You can use the Arduino IDE to compile and upload the sketch, but I prefer the [arduino-cli](https://arduino.github.io/arduino-cli/0.29/). First clone this git repository:
