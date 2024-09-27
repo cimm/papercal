@@ -54,7 +54,6 @@ arduino-cli monitor -p /dev/ttyUSB0
 
 ## Known Issues
 
-- All-day events also show on the day after the event, this is a bug.
 - Only the Synology Calendar CalDAV implementation is tested. File a bug if your CalDAV server does not work.
 - Only ASCII is supported. This limits the display of some characters. Full UTF-8 support would take up too much of the program storage space.
 
