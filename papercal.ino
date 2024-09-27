@@ -67,33 +67,33 @@ void refresh_display() {
   }
 }
 
-void events_to_display(tm start) {
+void events_to_display(tm day_start) {
   Calendar cal(CALENDAR_USER, CALENDAR_PASSWORD, CALENDAR_URL);
   if (!cal.is_valid()) {
     set_error(cal.last_error_message.c_str());
     return;
   }
-  std::vector<Event> events = cal.events(start);
+  std::vector<Event> events = cal.events(day_start);
   if (cal.error()) {
     set_error(cal.last_error_message.c_str());
     return;
   }
   if (events.empty()) { return; }
-  day_to_display(start);
+  day_to_display(day_start);
   for (Event event : events) {
-    event_to_display(event);
+    event_to_display(event, day_start);
   }
 }
 
-void event_to_display(Event event) {
-  std::string start = "";
-  if (!event.is_all_day()) {
+void event_to_display(Event event, tm day_start) {
+  std::string event_start = "";
+  if (!event.is_all_day() && event.starts_on(day_start)) {
     char formatted_start[8];
-    start = event.formatted_start("%H:%M");
+    event_start = event.formatted_start("%H:%M");
   }
   std::string summary = event.summary();
   if (summary.length() > 24) { summary = summary.substr(0, 26) + "-"; }
-  ui.row(start, summary);
+  ui.row(event_start, summary);
 }
 
 void day_to_display(tm time_info) {

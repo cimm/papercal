@@ -61,11 +61,15 @@ public:
     return property("VEVENT", "DURATION");
   }
 
-  bool valid_on(tm day) {  // Synology also returns single all days events the day after, see https://stackoverflow.com/q/75379228
-    return (duration() == "P1D" && start().tm_mday != day.tm_mday) ? false : true;
+  bool starts_on(tm day) {  // Multi day events can start days before
+    return (start().tm_mday == day.tm_mday) ? true : false;
   }
 
   bool is_all_day() {
-    return duration() == "P1D";  // TODO all day events an be longer than 1 day
+    return duration() == "P1D";
+  }
+
+  bool valid_on(tm day) {  // Synology also returns single all days events the day after, see https://stackoverflow.com/q/75379228
+    return (is_all_day() && !starts_on(day)) ? false : true;
   }
 };
