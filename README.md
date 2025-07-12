@@ -27,14 +27,14 @@ arduino-cli config init
 arduino-cli config set board_manager.additional_urls https://dl.espressif.com/dl/package_esp32_index.json
 arduino-cli core update-index
 arduino-cli core install esp32:esp32
-arduino-cli lib install GxEPD2@1.5.9
+arduino-cli lib install GxEPD2@1.6.4
 ```
 
 Finally, compile and upload the sketch:
 
 ```sh
-arduino-cli compile --fqbn esp32:esp32:esp32:PartitionScheme=no_ota papercal/
-arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32 papercal/
+arduino-cli compile --fqbn esp32:esp32:esp32:PartitionScheme=no_ota
+arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32
 ```
 
 The partition scheme wasn’t necessary before, but a year later, we ran out of space on the board. Switching to a different partition scheme freed up some room (see `arduino-cli board details --fqbn esp32:esp32:esp32` for details). I suspect one of the libraries might have been updated and now takes up more space now.
@@ -43,7 +43,7 @@ After uploading, the board will restart. Wait a few seconds, and if everything w
 
 ```sh
 sudo chmod a+rw /dev/ttyUSB0
-arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32 papercal/
+arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32
 ```
 
 Use the Arduino Serial Monitor extra debug info:
