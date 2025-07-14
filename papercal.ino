@@ -55,7 +55,7 @@ void get_datetimes() {
 }
 
 void enable_display() {
-  device_display.enable_display();
+  device_display.enable_display(); // Serial output from class not printed, too soon
   ui.reset();
 }
 

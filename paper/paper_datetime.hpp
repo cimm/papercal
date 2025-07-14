@@ -14,5 +14,8 @@ public:
     while (!getLocalTime(&time_info)) {
       delay(PAUZE);
     }
+    char formatted_date[64];
+    strftime(formatted_date, sizeof(formatted_date), "%d/%m %H:%M", &time_info);
+    Serial.printf("It is %s according to %s\n", formatted_date, ntp_pool);
   }
 };

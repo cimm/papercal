@@ -27,6 +27,7 @@ public:
     digitalWrite(EPD_RST, HIGH);
     delay(PAUZE);
     panel.init();
+    Serial.println("Display enabled");
   }
 
   void disable_display() {
@@ -34,5 +35,6 @@ public:
     digitalWrite(EPD_RST, LOW);
     delay(PAUZE);
     digitalWrite(EPD_RST, HIGH);
+    Serial.println("Display disabled");
   }
 };
