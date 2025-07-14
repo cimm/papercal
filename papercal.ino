@@ -23,9 +23,9 @@ tm tomorrow = { 0 };
 
 void setup() {
   Serial.begin(9600);
-  enable_display();
   connect_wifi();
   get_datetimes();
+  reset_ui();
   events_to_display(today);
   events_to_display(tomorrow);
   refresh_datetime_to_display();
@@ -54,8 +54,7 @@ void get_datetimes() {
   tomorrow.tm_sec = 1;
 }
 
-void enable_display() {
-  device_display.enable_display(); // Serial output from class not printed, too soon
+void reset_ui() {
   ui.reset();
 }
 
@@ -63,6 +62,7 @@ void refresh_display() {
   if (error && !REFRESH_ON_ERROR) {
     Serial.println("Error and REFRESH_ON_ERROR is false: will not refresh display!");
   } else {
+    device_display.enable_display();
     device_display.panel.display();
   }
 }
