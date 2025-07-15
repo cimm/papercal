@@ -65,8 +65,8 @@ public:
     return (start().tm_mday == day.tm_mday) ? true : false;
   }
 
-  bool is_all_day() {
-    return duration() == "P1D";
+  bool is_all_day() {  // All day events have a DTSTART;VALUE=DATE with a date, normal events a DTSTART with datetime
+    return property("VEVENT", "DTSTART;VALUE=DATE") != "";
   }
 
   bool valid_on(tm day) {  // Synology also returns single all days events the day after, see https://stackoverflow.com/q/75379228
