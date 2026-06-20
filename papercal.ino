@@ -19,15 +19,15 @@ PaperWifi device_wifi;
 UI ui(&device_display);
 bool error = false;
 tm today = { 0 };
-tm tomorrow = { 0 };
+const uint8_t MAX_DAYS = 7;
+const uint32_t SECONDS_IN_DAY = 86400;
 
 void setup() {
   Serial.begin(9600);
   connect_wifi();
   get_datetimes();
   reset_ui();
-  events_to_display(today);
-  events_to_display(tomorrow);
+  fill_days();
   refresh_datetime_to_display();
   disconnect_wifi();
   refresh_display();
@@ -47,11 +47,6 @@ void disconnect_wifi() {
 void get_datetimes() {
   device_datetime.fetch(TIME_ZONE, NTP_POOL);
   today = device_datetime.time_info;
-  time_t next_day_timestamp = mktime(&today) + (24 * 3600);  // add 1 day in seconds
-  tomorrow = *localtime(&next_day_timestamp);
-  tomorrow.tm_hour = 0;  // beginning of day
-  tomorrow.tm_min = 0;
-  tomorrow.tm_sec = 1;
 }
 
 void reset_ui() {
@@ -64,6 +59,20 @@ void refresh_display() {
   } else {
     device_display.enable_display();
     device_display.panel.display();
+  }
+}
+
+void fill_days() {
+  time_t now_t = mktime(&today);
+  for (uint8_t day_offset = 0; day_offset < MAX_DAYS; day_offset++) {
+    time_t day_t = now_t + (day_offset * SECONDS_IN_DAY);
+    tm day_start = *localtime(&day_t);
+    if (day_offset > 0) {
+      day_start.tm_hour = 0;
+      day_start.tm_min = 0;
+      day_start.tm_sec = 0;
+    }
+    events_to_display(day_start);
   }
 }
 
