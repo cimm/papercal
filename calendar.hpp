@@ -26,7 +26,7 @@ class Calendar {
     std::vector<Event> events;
     for (tinyxml2::XMLElement* child = doc.RootElement()->FirstChildElement(); child != NULL; child = child->NextSiblingElement()) {
       Event event(child->FirstChildElement("propstat")->FirstChildElement("prop")->FirstChildElement("C:calendar-data")->GetText());
-      if (event.valid_on(start)) { events.push_back(event); }
+      events.push_back(event);
     }
     return events;
   }

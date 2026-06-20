@@ -68,8 +68,4 @@ public:
   bool is_all_day() {  // All day events have a DTSTART;VALUE=DATE with a date, normal events a DTSTART with datetime
     return property("VEVENT", "DTSTART;VALUE=DATE") != "";
   }
-
-  bool valid_on(tm day) {  // Synology also returns single all days events the day after, see https://stackoverflow.com/q/75379228
-    return (is_all_day() && !starts_on(day)) ? false : true;
-  }
 };
