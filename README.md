@@ -37,6 +37,12 @@ arduino-cli compile --fqbn esp32:esp32:esp32:PartitionScheme=no_ota
 arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32
 ```
 
+Or compile and upload in one go:
+
+```sh
+arduino-cli compile --upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32:PartitionScheme=no_ota
+```
+
 The partition scheme wasn’t necessary before, but a year later, we ran out of space on the board. Switching to a different partition scheme freed up some room (see `arduino-cli board details --fqbn esp32:esp32:esp32` for details). I suspect one of the libraries might have been updated and now takes up more space now.
 
 After uploading, the board will restart. Wait a few seconds, and if everything went well, you should see your upcoming events. If you get an error like ‘Could not open /dev/ttyUSB0’, you might not have permission to access the USB port. Try changing the permissions and uploading again.
