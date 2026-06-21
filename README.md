@@ -27,7 +27,7 @@ arduino-cli config init
 arduino-cli config set board_manager.additional_urls https://dl.espressif.com/dl/package_esp32_index.json
 arduino-cli core update-index
 arduino-cli core install esp32:esp32
-arduino-cli lib install GxEPD2@1.6.4
+arduino-cli lib install GxEPD2@1.6.9
 ```
 
 Finally, compile and upload the sketch:
