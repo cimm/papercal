@@ -68,4 +68,20 @@ public:
   bool is_all_day() {  // All day events have a DTSTART;VALUE=DATE with a date, normal events a DTSTART with datetime
     return property("VEVENT", "DTSTART;VALUE=DATE") != "";
   }
+
+  bool covers_day(tm day_start) {
+    if (is_all_day()) {
+      std::string dur = duration();
+      if (!dur.empty() && dur.front() == 'P' && dur.back() == 'D') {
+        int duration_days = std::atoi(dur.substr(1, dur.length() - 2).c_str());
+        if (duration_days > 0) {
+          int day_num = (day_start.tm_year + 1900) * 10000 + (day_start.tm_mon + 1) * 100 + day_start.tm_mday;
+          std::string dtstart = property("VEVENT", "DTSTART;VALUE=DATE");
+          int start_num = std::atoi(dtstart.substr(0, 8).c_str());
+          return day_num >= start_num && day_num < start_num + duration_days;
+        }
+      }
+    }
+    return true;
+  }
 };
